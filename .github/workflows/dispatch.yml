@@ -19,10 +19,10 @@ jobs:
           echo The targetRef is ${{ inputs.targetRef }}.
 
       - name: Checkout with target branch (targetRef)
-      - uses: actions/checkout@v3
+        uses: actions/checkout@v3
         with:
           ref: ${{ inputs.targetRef }} # fetch only target branch
       
       - name: Simply print data json into console
-      - run: |
+        run: |
           cat data.json
