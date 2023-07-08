@@ -1,5 +1,7 @@
 # Github Action Dispatch and web hooks testing
 
+[Create a workflow dispatch event](https://docs.github.com/en/rest/actions/workflows?apiVersion=2022-11-28#create-a-workflow-dispatch-event)
+
 How to trigger dispatch from api
 ```
 url:
