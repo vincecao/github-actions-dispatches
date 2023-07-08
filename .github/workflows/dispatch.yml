@@ -1,0 +1,28 @@
+name: test_dispatch
+
+on:
+  workflow_dispatch: 
+    inputs:
+      fieldOne: 
+        required: true 
+        type: string
+      targetRef: 
+        required: true 
+        type: string
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print fieldOne and targetRef
+        run: |
+          echo The fieldOne is ${{ inputs.fieldOne }}.
+          echo The targetRef is ${{ inputs.targetRef }}.
+
+      - name: Checkout with target branch (targetRef)
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ inputs.targetRef }} # fetch only target branch
+      
+      - name: Simply print data json into console
+      - run: |
+          cat data.json
