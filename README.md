@@ -4,6 +4,9 @@
 
 How to trigger dispatch from api
 ```
+method:
+  POST
+
 url:
   https://api.github.com/repos/vincecao/github-actions-dispatches/actions/workflows/dispatch.yml/dispatches
 
