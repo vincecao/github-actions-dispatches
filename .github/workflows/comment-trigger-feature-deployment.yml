@@ -3,6 +3,7 @@ name: Comment Triggered Feature Deployment
 permissions:
   pull-requests: write
   issues: write
+  workflow: write
 
 on:
   issue_comment:
