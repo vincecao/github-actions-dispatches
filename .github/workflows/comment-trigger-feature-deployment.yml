@@ -1,10 +1,5 @@
 name: Comment Triggered Feature Deployment
 
-permissions:
-  pull-requests: write
-  issues: write
-  workflow: write
-
 on:
   issue_comment:
     types: [created]
@@ -12,6 +7,10 @@ on:
 
 jobs:
   deploy:
+    permissions: 
+        pull-requests: write
+        issues: write
+        actions: write
     runs-on: ubuntu-latest
     steps:
       - name: Comment deployment start on the PR
