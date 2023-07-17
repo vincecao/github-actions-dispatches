@@ -3,15 +3,14 @@ name: Comment Triggered Main Branch Deployment
 on:
   issue_comment:
     types: [created]
-    pattern: "%%MAIN_BRANCH_DEPLOYMENT%%"
 
 jobs:
-  deploy:
+  deploy-main-branch:
     permissions: 
         pull-requests: write
         issues: write
         actions: write
-    if: ${{ github.event.issue.pull_request }} #This job only runs for pull request comments
+    if: ${{ github.event.issue.pull_request && contains(github.event.comment.body, '%%main_branch_deployment%%') }} #This job only runs for pull request comments
     runs-on: ubuntu-latest
     steps:
       - name: Comment main branch deployment start on the PR
