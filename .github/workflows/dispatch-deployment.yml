@@ -22,9 +22,9 @@ jobs:
       - name: Checkout with target branch (targetRef)
         uses: actions/checkout@v3
         with:
-          ref: ${{ inputs.targetRef }} # fetch only target branch
+          ref: ${{ inputs.targetRef }} # checkout code from target branch
       
       - name: Simply print data json into console
         run: |
-          # mock deployment
+          # mock deployment, modify to do actual deployment
           cat data.json
