@@ -11,6 +11,7 @@ jobs:
         pull-requests: write
         issues: write
         actions: write
+    if: ${{ github.event.issue.pull_request }} #This job only runs for pull request comments
     runs-on: ubuntu-latest
     steps:
       - name: Comment deployment start on the PR
@@ -43,7 +44,7 @@ jobs:
           script: |
             const workflowId = "dispatch-deployment.yml";
             const inputs = {
-              targetRef: "${{ github.event.pull_request.base.ref }}", // pass current PR branch to targetRef input
+              targetRef: "${{ github.event.issue.pull_request.base.ref }}", // pass current PR branch to targetRef input
               customField: "triggered by feature deployment comment",
             };
             github.rest.actions.createWorkflowDispatch({
