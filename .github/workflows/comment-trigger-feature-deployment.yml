@@ -1,11 +1,75 @@
-name: Comment Triggered Feature Branch Deployment
+name: Comment Triggered Branch Deployment
 
 on:
   issue_comment:
     types: [created]
 
 jobs:
-  deploy-feature-branch:
+  deploy-main-branch: # will be triggered when detecting %%main_branch_deployment%%
+    permissions: 
+        pull-requests: write
+        issues: write
+        actions: write
+    if: ${{ github.event.issue.pull_request && contains(github.event.comment.body, '%%main_branch_deployment%%') }} #This job only runs for pull request comments
+    runs-on: ubuntu-latest
+    steps:
+      - name: Comment main branch deployment start on the PR
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const comment = `
+              **Main branch mock deployment started.**
+              
+              Please wait till the deployment finishes.
+              
+              You can navigate to github action page for visualizing deployment the progress.
+              https://github.com/vincecao/github-actions-dispatches/actions
+            `;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment,
+            });
+
+      - name: Trigger mock main branch deployment dispatch workflow
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const workflowId = "dispatch-deployment.yml";
+            const inputs = {
+              targetRef: "main", // deployment use main branch as target
+              customField: "triggered by main branch deployment comment",
+            };
+            github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: "main",
+              workflow_id: workflowId,
+              inputs,
+            });
+
+      - name: Comment main branch deployment finish on the PR
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const comment = `
+              **Main branch mock deployment deployed.**
+              
+              You can navigate to github action page for visualizing deployment the progress.
+              https://github.com/vincecao/github-actions-dispatches/actions
+            `;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment,
+            });
+
+  deploy-feature-branch: # will be triggered when detecting %%feature_branch_deployment%%
     permissions: 
         pull-requests: write
         issues: write
