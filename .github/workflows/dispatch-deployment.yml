@@ -1,22 +1,23 @@
-name: test_dispatch
+name: Mock Dispatch Deployment API
 
 on:
   workflow_dispatch: 
     inputs:
-      fieldOne: 
-        required: true 
-        type: string
       targetRef: 
         required: true 
         type: string
+      customField: 
+        required: true 
+        type: string
+      
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Print fieldOne and targetRef
+      - name: Print custom field and targetRef
         run: |
-          echo The fieldOne is ${{ inputs.fieldOne }}.
-          echo The targetRef is ${{ inputs.targetRef }}.
+          echo "targetRef received: <${{ inputs.targetRef }}>".
+          echo "customField received:  <${{ inputs.customField }}>".
 
       - name: Checkout with target branch (targetRef)
         uses: actions/checkout@v3
@@ -25,4 +26,5 @@ jobs:
       
       - name: Simply print data json into console
         run: |
+          # mock deployment
           cat data.json

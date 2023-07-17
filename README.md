@@ -21,8 +21,8 @@ body:
   {
     "ref": "main", // action located ref
     "inputs": {
-        "fieldOne": "test value", // action dispatch input one
-        "targetRef": "main", // action dispatch input two
+        "targetRef": "main", // dispatch input for target branch for mock deployment
+        "customField": "test custom field value", // sample action dispatch input
     }
   }
 ```

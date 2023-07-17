@@ -1,0 +1,59 @@
+name: Comment Triggered Feature Deployment
+
+on:
+  issue_comment:
+    types: [created]
+    pattern: "%%FEATURE_BRANCH_DEPLOYMENT%%"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Comment deployment start on the PR
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const comment = `
+              Feature branch mock deployment started. Please wait for the deployment.
+              
+              You can navigate to github action page for visualizing deployment the progress.
+              https://github.com/vincecao/github-actions-dispatches/actions
+            `;
+
+            github.issues.createComment({
+              issue_number: context.issue.number,
+              body: comment,
+            });
+
+      - name: Check out the repository
+        uses: actions/checkout@v3
+
+      - name: Trigger mock deployment dispatch workflow
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const workflowId = "dispatch-deployment.yml";
+            const inputs = {
+              targetRef: "${{ github.event.pull_request.base.ref }}", // pass current PR branch to targetRef input
+              customField: "triggered by feature deployment comment",
+            };
+            github.actions.dispatch({
+              workflow_id: workflowId,
+              inputs,
+            });
+
+      - name: Comment on the PR
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const comment = `
+              Feature branch mock deployment deployed.
+              
+              You can navigate to github action page for visualizing deployment the progress.
+              https://github.com/vincecao/github-actions-dispatches/actions
+            `;
+
+            github.issues.createComment({
+              issue_number: context.issue.number,
+              body: comment,
+            });
