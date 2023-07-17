@@ -47,7 +47,6 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const workflowId = "dispatch-deployment.yml";
-            console.log(JSON.stringify(context.issue, null, 4))
             const inputs = {
               targetRef: "${{ steps.get-branch.outputs.branch }}", // deployment use current PR base branch as target
               customField: "triggered by feature branch deployment comment",
