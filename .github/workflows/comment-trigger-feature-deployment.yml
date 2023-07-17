@@ -45,9 +45,10 @@ jobs:
               targetRef: "${{ github.event.pull_request.base.ref }}", // pass current PR branch to targetRef input
               customField: "triggered by feature deployment comment",
             };
-            github.rest.actions.dispatch({
+            github.rest.actions.createWorkflowDispatch({
               owner: context.repo.owner,
               repo: context.repo.repo,
+              ref: "main",
               workflow_id: workflowId,
               inputs,
             });
