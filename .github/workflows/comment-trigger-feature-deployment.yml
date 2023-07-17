@@ -1,7 +1,7 @@
 name: Comment Triggered Feature Deployment
 
 on:
-  pull_request_review_comment:
+  issue_comment:
     types: [created]
     pattern: "%%FEATURE_BRANCH_DEPLOYMENT%%"
 
