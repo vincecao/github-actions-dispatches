@@ -34,8 +34,12 @@ jobs:
               body: comment,
             });
 
-      - name: Check out the repository
-        uses: actions/checkout@v3
+      - id: 'get-branch'
+        run: echo ::set-output name=branch::$(gh pr view $PR_NO --repo $REPO --json headRefName --jq '.headRefName')
+        env:
+          REPO: ${{ github.repository }}
+          PR_NO: ${{ github.event.issue.number }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Trigger mock deployment dispatch workflow
         uses: actions/github-script@v6
@@ -44,7 +48,7 @@ jobs:
           script: |
             const workflowId = "dispatch-deployment.yml";
             const inputs = {
-              targetRef: "${{ github.event.issue.pull_request.base.ref }}", // pass current PR branch to targetRef input
+              targetRef: "${{ steps.get-branch.outputs.branch }}", // pass current PR branch to targetRef input
               customField: "triggered by feature deployment comment",
             };
             github.rest.actions.createWorkflowDispatch({
