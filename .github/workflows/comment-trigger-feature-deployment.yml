@@ -39,6 +39,7 @@ jobs:
       - name: Trigger mock deployment dispatch workflow
         uses: actions/github-script@v6
         with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const workflowId = "dispatch-deployment.yml";
             const inputs = {
