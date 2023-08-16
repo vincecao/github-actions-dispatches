@@ -19,37 +19,42 @@ jobs:
           echo "pullRequestNumber received: <${{ inputs.pullRequestNumber }}>".
           echo "customField received:  <${{ inputs.customField }}>".
 
-      - name: Check mergeability
+      - name: Check mergeability (Only conflicts not status checks)
         uses: "actions/github-script@v6"
         with:
           script: |
-            const { data: pullRequest } = await github.pulls.get({
+            const { data: pullRequest } = await github.rest.pulls.get({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              pull_number: Number(${{ inputs.pullRequestNumber }}),
+              pull_number: Number("${{ inputs.pullRequestNumber }}"),
             });
 
-            if (pullRequest.mergeable) {
+            console.info(JSON.stringify(pullRequest, null, 4))
+
+            if (pullRequest.mergeable === false) {
+              core.setFailed('PR is not mergeable due to conflicts');  // set workflow failed
+            } else {
               console.log('PR is mergeable');
               const headRef = pullRequest.head.ref;
               console.log(`Setting headRef environment variable to ${headRef}`);
               core.exportVariable('headRef', headRef);
-            } else {
-              core.setFailed('PR is not mergeable');  // set workflow failed
             }
 
-      - name: Source Contains all production code
+      - name: Checkout with base (production)
+        uses: actions/checkout@v3
+
+      - name: Check source ref contains all base ref (production code)
         run: |
-          git fetch origin master
+          git fetch origin main
           git checkout ${{ env.headRef }}
-          if git merge-base --is-ancestor master HEAD; then
+          if git merge-base --is-ancestor main HEAD; then
             echo "Source branch contains all code from master branch (production)."
           else
             echo "Source branch does not contain all code from master branch (production)."
             exit 1 # set workflow failed
           fi
 
-      - name: Checkout with source branch (headRef)
+      - name: Checkout with source (headRef)
         uses: actions/checkout@v3
         with:
           ref: ${{ env.headRef }} # checkout code from source branch
