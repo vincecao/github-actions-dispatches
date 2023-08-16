@@ -13,6 +13,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env: 
+      productionRef: main 
     steps:
       - name: Print custom field and targetRef
         run: |
@@ -35,29 +37,30 @@ jobs:
               core.setFailed('PR is not mergeable due to conflicts');  // set workflow failed
             } else {
               console.log('PR is mergeable');
-              const headRef = pullRequest.head.ref;
-              console.log(`Setting headRef environment variable to ${headRef}`);
-              core.exportVariable('headRef', headRef);
+              const sourceRef = pullRequest.head.ref;
+              console.log(`Setting sourceRef environment variable to ${sourceRef}`);
+              core.exportVariable('sourceRef', sourceRef);
             }
 
-      - name: Checkout with base (production)
+      - name: Checkout with productionRef
         uses: actions/checkout@v3
 
-      - name: Check source ref contains all base ref (production code)
+      - name: Check source ref contains all productionRef
         run: |
-          git fetch origin main
-          git checkout ${{ env.headRef }}
-          if git merge-base --is-ancestor main HEAD; then
-            echo "Source branch contains all code from master branch (production)."
+          git fetch origin ${{ env.productionRef }}
+          git fetch origin ${{ env.sourceRef }}
+          git checkout ${{ env.sourceRef }}
+          if git merge-base --is-ancestor ${{ env.productionRef }} HEAD; then
+            echo "${{ env.sourceRef }} contains all code from ${{ env.productionRef }} branch (production)."
           else
-            echo "Source branch does not contain all code from master branch (production)."
+            echo "${{ env.sourceRef }} does not contain all code from ${{ env.productionRef }} branch (production)."
             exit 1 # set workflow failed
           fi
 
-      - name: Checkout with source (headRef)
+      - name: Checkout with sourceRef
         uses: actions/checkout@v3
         with:
-          ref: ${{ env.headRef }} # checkout code from source branch
+          ref: ${{ env.sourceRef }} # checkout code from source branch
 
       - name: Simply print data json into console
         run: |
