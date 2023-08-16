@@ -1,0 +1,60 @@
+name: Mock Dispatch Deployment API with pull request number
+
+on:
+  workflow_dispatch: 
+    inputs:
+      pullRequestNumber: 
+        required: true 
+        type: number
+      customField: 
+        required: true 
+        type: string
+      
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print custom field and targetRef
+        run: |
+          echo "pullRequestNumber received: <${{ inputs.pullRequestNumber }}>".
+          echo "customField received:  <${{ inputs.customField }}>".
+
+      - name: Check mergeability
+        uses: "actions/github-script@v6"
+        with:
+          script: |
+            const { data: pullRequest } = await github.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: Number(${{ inputs.pullRequestNumber }}),
+            });
+
+            if (pullRequest.mergeable) {
+              console.log('PR is mergeable');
+              const headRef = pullRequest.head.ref;
+              console.log(`Setting headRef environment variable to ${headRef}`);
+              core.exportVariable('headRef', headRef);
+            } else {
+              core.setFailed('PR is not mergeable');  // set workflow failed
+            }
+
+      - name: Source Contains all production code
+        run: |
+          git fetch origin master
+          git checkout ${{ env.headRef }}
+          if git merge-base --is-ancestor master HEAD; then
+            echo "Source branch contains all code from master branch (production)."
+          else
+            echo "Source branch does not contain all code from master branch (production)."
+            exit 1 # set workflow failed
+          fi
+
+      - name: Checkout with source branch (headRef)
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ env.headRef }} # checkout code from source branch
+
+      - name: Simply print data json into console
+        run: |
+          # mock deployment, modify to do actual deployment
+          cat data.json
